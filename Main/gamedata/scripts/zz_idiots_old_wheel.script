@@ -86,6 +86,7 @@ function on_game_start()
   RegisterScriptCallback("on_key_press",on_key_press)
   RegisterScriptCallback("on_key_release",on_key_release)
   UnregisterScriptCallback("on_key_release", idiots_keybinds.onKeyRelease)
+  RegisterScriptCallback("on_key_release",axr_companions.on_key_release)
 end
 
 idiots_ui_OG_Wheel_OnKeyboard = idiots_ui.UIWheelCompanion.OnKeyboard
@@ -140,12 +141,33 @@ function UIWheelCompanion:OnKeyboard(dik, keyboard_action)
 	return res
 end
 
-axrc_OG_Wheel_OnKeyboard = axrc.UIWheelCompanion.OnKeyboard
-function cw_prepare()
-	axrc.cw_commands["combat"]    = {	key= "DIK_1"	,on_state= 1	,get= axrc.get_companion_combat_mode		,set_one= axrc.set_companion_squad_combat_mode	,set_all= axrc.cycle_companions_combat_mode		,on_str= "st_set_companion_to_attack_state"					,off_str= "st_set_companion_to_ignore_combat_state"	}
-	axrc.cw_commands["movement"]  = {	key= "DIK_2"	,on_state= 2	,get= axrc.get_companion_move_mode	    ,set_one= axrc.set_companion_squad_move_mode		,set_all= axrc.cycle_companions_move_mode		,on_str= "st_set_companion_to_follow_state"					,off_str= "st_set_companion_to_wait_state"			}
-	axrc.cw_commands["stealth"]   = {	key= "DIK_3"	,on_state= 1	,get= axrc.get_companion_stealth_mode	,set_one= axrc.set_companion_squad_stealth_mode	,set_all= axrc.cycle_companions_stealth_mode		,on_str= "st_set_companion_to_stealth_substate"				,off_str= "st_set_companion_to_default_substate"	}
-	axrc.cw_commands["distance"]  = {	key= "DIK_4"	,on_state= 2	,get= axrc.get_companion_distance_mode	,set_one= axrc.set_companion_squad_distance_mode	,set_all= axrc.cycle_companions_distance_mode	,on_str= "st_set_companion_to_stay_far"						,off_str= "st_set_companion_to_stay_close"			}
-	axrc.cw_commands["loot"]      = {	key= "DIK_5"	,on_state= 1	,get= axrc.get_companion_loot_mode	    ,set_one= axrc.set_companion_squad_loot_mode		,set_all= axrc.cycle_companions_loot_mode		,on_str= "st_set_companion_to_loot_items_and_corpses"		,off_str= "st_set_companion_to_loot_nothing"		}
-	axrc.cw_commands["trade"] 	 = {	key= "DIK_6"	,on_state= 1	,get= axrc.companion_inventory_mode		,set_one= axrc.start_trade						,off_str= "st_set_companion_to_trade"	}
-end
+-- local cw_commands = {}
+
+-- axrc_OG_cw_prepare = axrc.cw_prepare
+-- function axrc.cw_prepare()
+--   printf("[UW] cw_prepare")
+--   cw_commands["combat"]    = {	key= "DIK_1"	,on_state= 1	,get= axrc.get_companion_combat_mode		,set_one= uw_set_companion_squad_combat_mode	,set_all= axrc.cycle_companions_combat_mode		,on_str= "st_set_companion_to_attack_state"					,off_str= "st_set_companion_to_ignore_combat_state"	}
+-- 	cw_commands["movement"]  = {	key= "DIK_2"	,on_state= 2	,get= axrc.get_companion_move_mode	    ,set_one= uw_set_companion_squad_move_mode		,set_all= axrc.cycle_companions_move_mode		,on_str= "st_set_companion_to_follow_state"					,off_str= "st_set_companion_to_wait_state"			}
+-- 	cw_commands["stealth"]   = {	key= "DIK_3"	,on_state= 1	,get= axrc.get_companion_stealth_mode	,set_one= axrc.set_companion_squad_stealth_mode	,set_all= axrc.cycle_companions_stealth_mode		,on_str= "st_set_companion_to_stealth_substate"				,off_str= "st_set_companion_to_default_substate"	}
+-- 	cw_commands["distance"]  = {	key= "DIK_4"	,on_state= 2	,get= axrc.get_companion_distance_mode	,set_one= axrc.set_companion_squad_distance_mode	,set_all= axrc.cycle_companions_distance_mode	,on_str= "st_set_companion_to_stay_far"						,off_str= "st_set_companion_to_stay_close"			}
+-- 	cw_commands["loot"]      = {	key= "DIK_5"	,on_state= 1	,get= axrc.get_companion_loot_mode	    ,set_one= axrc.set_companion_squad_loot_mode		,set_all= axrc.cycle_companions_loot_mode		,on_str= "st_set_companion_to_loot_items_and_corpses"		,off_str= "st_set_companion_to_loot_nothing"		}
+-- 	cw_commands["trade"] 	 = {	key= "DIK_6"	,on_state= 1	,get= axrc.companion_inventory_mode		,set_one= axrc.start_trade						,off_str= "st_set_companion_to_trade"	}
+
+--   axrc.cw_commands = cw_commands
+-- end
+
+-- function uw_set_companion_squad_combat_mode(mode,npc,squad)
+--   printf("[UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc, squad )
+--   local group = "readiness" 
+--   local action = "attack"
+--   local group = "readiness" 
+--   local action = "ignore"  
+--   axrc.set_companion_squad_combat_mode(mode,npc,squad)
+-- end
+
+-- function uw_set_companion_squad_move_mode(mode,npc,squad)
+--   printf("[UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc, squad )
+--   local group = "readiness"
+--   local action = "ignore"
+--   axrc.set_companion_squad_move_mode(mode,npc,squad)
+-- end
