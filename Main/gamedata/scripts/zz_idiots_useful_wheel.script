@@ -6,7 +6,7 @@ local CLOSE_TIMEOUT
 
 -- idiots_ui_OG_openUI = idiots_ui.openUI
 function openUI(use_wheel)
-  printf("$ [UW] openUI")
+  -- printf("$ [UW] openUI")
   hide_hud_inventory()
 
   if not idiots_ui.GUI then
@@ -64,7 +64,7 @@ function on_key_press(key)
     -- printf("![Idiots] bind %s", bind)
     -- printf("![Idiots] (bind == key_bindings.kCUSTOM18) and mod_key_pressed(2)= %s", (bind == key_bindings.kCUSTOM18) and mod_key_pressed(3))
     if bind == key_bindings.kCUSTOM18 and mod_key_pressed(mod_keys[DIK_keys.DIK_LMENU].code) then
-        printf("-- [Idiots] openUI")
+        -- printf("-- [Idiots] openUI")
         local use_wheel = false
         openUI(use_wheel)
     end
@@ -120,9 +120,8 @@ end
 
 idiots_ui_OG_Wheel_OnClickButton = idiots_ui.UIWheelCompanion.OnClickButton
 function idiots_ui.UIWheelCompanion:OnClickButton(group, action)
-  printf("- [UW] 1 OnClickButton group %s action %s",group, action )
+  -- printf("- [UW] OnClickButton group %s action %s",group, action )
   idiots_ui_OG_Wheel_OnClickButton(self, group, action)
-  printf("- [UW] 2 OnClickButton group %s action %s",group, action )
   if not self.ID then
     if group == "readiness" then
       axrc._current_states["combat"] = (axrc._current_states["combat"] == 1) and 2 or 1
@@ -172,8 +171,7 @@ local cw_commands = {}
 
 axrc_OG_cw_prepare = axr_companions.cw_prepare
 function axr_companions.cw_prepare()
-  printf("- [UW] cw_prepare")
-  -- axrc_OG_cw_prepare()
+  -- printf("- [UW] cw_prepare")
   cw_commands["combat"]    = {	key= "DIK_1"	,on_state= 1	,get= axrc.get_companion_combat_mode		,set_one= uw_set_companion_squad_combat_mode	,set_all= uw_cycle_companions_combat_mode		,on_str= "st_set_companion_to_attack_state"					,off_str= "st_set_companion_to_ignore_combat_state"	}
 	cw_commands["movement"]  = {	key= "DIK_2"	,on_state= 2	,get= axrc.get_companion_move_mode	    ,set_one= uw_set_companion_squad_move_mode		,set_all= uw_cycle_companions_move_mode		,on_str= "st_set_companion_to_follow_state"					,off_str= "st_set_companion_to_wait_state"			}
 	cw_commands["stealth"]   = {	key= "DIK_3"	,on_state= 1	,get= axrc.get_companion_stealth_mode	,set_one= uw_set_companion_squad_stealth_mode	,set_all= uw_cycle_companions_stealth_mode		,on_str= "st_set_companion_to_stealth_substate"				,off_str= "st_set_companion_to_default_substate"	}
@@ -187,7 +185,7 @@ end
 -- single NPC
 
 function uw_set_companion_squad_combat_mode(mode,npc,squad)
-  printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
+  -- printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
   local group = "readiness"
   local action = (mode == 1) and "attack" or "ignore"
   if npc then
@@ -197,7 +195,7 @@ function uw_set_companion_squad_combat_mode(mode,npc,squad)
 end
 
 function uw_set_companion_squad_move_mode(mode,npc,squad)
-  printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
+  -- printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
   local group = "movement"
   local action = (mode == 1) and "wait" or "follow"
   if npc then
@@ -207,7 +205,7 @@ function uw_set_companion_squad_move_mode(mode,npc,squad)
 end
 
 function uw_set_companion_squad_stealth_mode(mode,npc,squad)
-  printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
+  -- printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
   local group = "stance"
   local action = (mode == 1) and "sneak" or "stand"
   if npc then
@@ -217,7 +215,7 @@ function uw_set_companion_squad_stealth_mode(mode,npc,squad)
 end
 
 function uw_set_companion_squad_distance_mode(mode,npc,squad)
-  printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
+  -- printf("- [UW] uw_set_companion_squad_move_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
   local group = "distance"
   local action = (mode == 1) and "near" or "far"
   if npc then
@@ -227,7 +225,7 @@ function uw_set_companion_squad_distance_mode(mode,npc,squad)
 end
 
 function uw_set_companion_squad_loot_mode(mode,npc,squad)
-  printf("- [UW] uw_set_companion_squad_loot_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
+  -- printf("- [UW] uw_set_companion_squad_loot_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
   local group = "job"
   local action = "loot_corpses"
   if npc then
@@ -239,57 +237,42 @@ end
 -- ALL
 
 function uw_cycle_companions_combat_mode(force_mode, no_msg)
-  printf("- [UW] uw_cycle_companions_combat_mode force_mode %s no_msg %s",force_mode, no_msg)
-  local current_mode = axrc._current_states["combat"]
-  printf("current mode %s", current_mode)
+  -- printf("- [UW] uw_cycle_companions_combat_mode force_mode %s no_msg %s",force_mode, no_msg)
   local group = "readiness"
-  local action = (current_mode == 2) and "attack" or "ignore"
+  local action = (axrc._current_states["combat"] == 2) and "attack" or "ignore"
   idiots_ui.GUI.ID = nil
   idiots_ui.GUI:OnClickButton(group, action)
-  -- axrc._current_states["combat"] = (current_mode == 1) and 2 or 1
 end
 
 function uw_cycle_companions_move_mode(force_mode, no_msg)
-  printf("- [UW] uw_cycle_companions_move_mode force_mode %s no_msg %s",force_mode, no_msg)
-  local current_mode = axrc._current_states["move"]
-  printf("current mode %s", current_mode)
+  -- printf("- [UW] uw_cycle_companions_move_mode force_mode %s no_msg %s",force_mode, no_msg)
   local group = "movement"
-  local action = (current_mode == 2) and "wait" or "follow"
+  local action = (axrc._current_states["move"] == 2) and "wait" or "follow"
   printf("- group %s action %s", group, action)
   idiots_ui.GUI.ID = nil
   idiots_ui.GUI:OnClickButton(group, action)
-  -- axrc._current_states["move"] = (current_mode == 1) and 2 or 1
 end
 
 function uw_cycle_companions_stealth_mode(force_mode, no_msg)
-  printf("- [UW] uw_cycle_companions_stealth_mode force_mode %s no_msg %s",force_mode, no_msg)
-  local current_mode = axrc._current_states["stealth"]
-  printf("current mode %s", current_mode)
+  -- printf("- [UW] uw_cycle_companions_stealth_mode force_mode %s no_msg %s",force_mode, no_msg)
   local group = "stance"
-  local action = (current_mode == 2) and "sneak" or "stand"
+  local action = (axrc._current_states["stealth"] == 2) and "sneak" or "stand"
   idiots_ui.GUI.ID = nil
   idiots_ui.GUI:OnClickButton(group, action)
-  -- axrc._current_states["stealth"] = (current_mode == 1) and 2 or 1
 end
 
 function uw_cycle_companions_distance_mode(force_mode, no_msg)
-  printf("- [UW] cycle_companions_distance_mode force_mode %s no_msg %s",force_mode, no_msg)
-  local current_mode = axrc._current_states["distance"]
-  printf("current mode %s", current_mode)
+  -- printf("- [UW] cycle_companions_distance_mode force_mode %s no_msg %s",force_mode, no_msg)
   local group = "distance"
-  local action = (current_mode == 2) and "near" or "far"
+  local action = (axrc._current_states["distance"] == 2) and "near" or "far"
   idiots_ui.GUI.ID = nil
   idiots_ui.GUI:OnClickButton(group, action)
-  -- axrc._current_states["distance"] = (current_mode == 1) and 2 or 1
 end
 
 function uw_cycle_companions_loot_mode(force_mode, no_msg)
-  printf("- [UW] uw_cycle_companions_loot_mode force_mode %s no_msg %s",force_mode, no_msg)
-  local current_mode = axrc._current_states["loot"]
-  printf("current mode %s", current_mode)
+  -- printf("- [UW] uw_cycle_companions_loot_mode force_mode %s no_msg %s",force_mode, no_msg)
   local group = "job"
   local action = "loot_corpses"
   idiots_ui.GUI.ID = nil
   idiots_ui.GUI:OnClickButton(group, action)
-  -- axrc._current_states["loot"] = (current_mode == 1) and 2 or 1
 end
