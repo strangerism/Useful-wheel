@@ -27,9 +27,9 @@ function openUI(use_wheel)
     idiots_ui.GUI:ShowDialog(true)
     idiots_ui.GUI:Show(true)
 
-    CLOSE_TIMEOUT = time_global()
     Register_UI("UIWheelCompanion", "idiots_ui")
   end
+  CLOSE_TIMEOUT = time_global()
 end
 
 
@@ -79,11 +79,11 @@ function on_key_release(key)
   if (dik_to_bind(key) == key_bindings.kCUSTOM18) then
     local use_wheel = true
     openUI(use_wheel)
-  end    
+  end
 end
 
 function on_game_start()
-  printf("-- [idiots_on_game_start][idiots_z_keybind_mp]")
+  -- printf("-- [idiots_on_game_start][idiots_z_keybind_mp]")
   RegisterScriptCallback("on_key_press",on_key_press)
   RegisterScriptCallback("on_key_release",on_key_release)
   UnregisterScriptCallback("on_key_release", idiots_keybinds.onKeyRelease)
@@ -92,18 +92,21 @@ end
 
 idiots_ui_OG_Wheel_OnKeyboard = idiots_ui.UIWheelCompanion.OnKeyboard
 function idiots_ui.UIWheelCompanion:OnKeyboard(dik, action)
-  -- printf("- [UW] idiots_ui.UIWheelCompanion:OnKeyboard")
+  -- printf("- [UW] idiots_ui.UIWheelCompanion:OnKeyboard CLOSE_TIMEOUT %s", CLOSE_TIMEOUT)
   local res  = CUIScriptWnd.OnKeyboard(self, dik, action)
   local bind = dik_to_bind(dik)
 
   if res ~= false or action ~= ui_events.WINDOW_KEY_RELEASED then
     return res
   end
-
+  if zzzz_dynahud then -- compat with dynahud dynamic companion hud
+    RemoveTimeEvent("companion_hud_keypress", "companion_hud_keypress_long")
+  end
   if not UTIL.timeExpired(CLOSE_TIMEOUT + 500) then
+    -- printf("![IW] GUI OPEN - TOO EARLY on CLOSE_TIMEOUT ")
     return
   end
-
+  -- printf("-[IW] CLOSE_TIMEOUT EXPIRED")
   if bind == key_bindings.kQUIT or bind == key_bindings.kUSE or bind == key_bindings.kCUSTOM18
     then self:Close()
   end
@@ -118,11 +121,7 @@ function idiots_ui.UIWheelCompanion:OnKeyboard(dik, action)
   return res
 end
 
-idiots_ui_OG_Wheel_OnClickButton = idiots_ui.UIWheelCompanion.OnClickButton
-function idiots_ui.UIWheelCompanion:OnClickButton(group, action)
-  -- printf("- [UW] OnClickButton group %s action %s",group, action )
-  idiots_ui_OG_Wheel_OnClickButton(self, group, action)
-  if not self.ID then
+function update_axrc_squad_state(group)
     if group == "readiness" then
       axrc._current_states["combat"] = (axrc._current_states["combat"] == 1) and 2 or 1
     end
@@ -135,22 +134,55 @@ function idiots_ui.UIWheelCompanion:OnClickButton(group, action)
     if group == "distance" then
         axrc._current_states["distance"] = (axrc._current_states["distance"] == 1) and 2 or 1
     end
-    if group == "job" then
+    if group == "jobs" then
         axrc._current_states["loot"] = (axrc._current_states["loot"] == 1) and 2 or 1
+    end
+end
+
+idiots_ui_OG_Wheel_InitTabs = idiots_ui.UIWheelCompanion.InitTabs
+function idiots_ui.UIWheelCompanion:InitTabs()
+  idiots_ui_OG_Wheel_InitTabs(self)
+  self.id = self.ID
+end
+
+idiots_ui_OG_Wheel_OnClickTab = idiots_ui.UIWheelCompanion.OnClickTab
+function idiots_ui.UIWheelCompanion:OnClickTab(index)
+  idiots_ui_OG_Wheel_OnClickTab(self,index)
+  self.id = self.ID
+end
+
+idiots_ui_OG_Wheel_OnClickButton = idiots_ui.UIWheelCompanion.OnClickButton
+function idiots_ui.UIWheelCompanion:OnClickButton(group, action)
+  -- printf("- [UW] OnClickButton group %s action %s",group, action )
+  -- self.ID is either set upstream with npc_id or null
+  self.id = self.ID
+  local clsid = axr_companions.list_actor_squad_by_id()
+  if not self.ID then
+    -- overcorrect case of 1 companion squad - useful idiots ui does not support "all" for this case and needs self.ID populated with npc id
+    if #clsid == 1 then
+          self.ID = clsid[1]
+          self.id = self.ID
+    end
+    idiots_ui_OG_Wheel_OnClickButton(self, group, action)
+    -- update the squad state in axr_companions
+    update_axrc_squad_state(group)
+  else
+    idiots_ui_OG_Wheel_OnClickButton(self, group, action)
+    if #clsid == 1 then
+      update_axrc_squad_state(group)
     end    
   end
 end
 
 -- axrc_OG_Wheel_OnKeyboard = axrc.UIWheelCompanion.OnKeyboard
--- function UIWheelCompanion:OnKeyboard(dik, keyboard_action)
---   printf("- [UW] OnKeyboard")
+-- function axr_companions.UIWheelCompanion:OnKeyboard(dik, keyboard_action)
+--   printf("- [UW] cw_cooldown %s", axrc.cw_cooldown)
 -- 	local res = CUIScriptWnd.OnKeyboard(self,dik,keyboard_action)
 -- 	if (res == false) then
 -- 		if keyboard_action == ui_events.WINDOW_KEY_RELEASED then
 		
 -- 			local bind = dik_to_bind(dik)
--- 			if (time_global() > axrc.cw_cooldown + 100) and (bind == key_bindings.kQUIT or bind == key_bindings.kUSE or bind == key_bindings.kCUSTOM18) then
--- 				idiots_ui.GUI:Close()
+-- 			if (time_global() > axrc.cw_cooldown + 500) and (bind == key_bindings.kQUIT or bind == key_bindings.kUSE or bind == key_bindings.kCUSTOM18) then
 -- 				self:Close()
 -- 				return
 -- 			end
@@ -166,6 +198,27 @@ end
 -- 	end
 -- 	return res
 -- end
+if axr_companions_va_gamma_patch then
+  -- printf("-[UW] Monkey patch axr_companions_va_gamma_patch")
+  axrc_OG_UIWheelCompanion_Order = axr_companions_va_gamma_patch.UIWheelCompanion_Order
+  function axr_companions.UIWheelCompanion.Order(self, cmd)
+    axrc_OG_UIWheelCompanion_Order(self, cmd)
+  end
+  
+end
+
+
+
+axrc_OG_UIWheelCompanion_Reset = axr_companions.UIWheelCompanion.Reset
+function axr_companions.UIWheelCompanion:Reset(obj)
+  axrc_OG_UIWheelCompanion_Reset(self, obj)
+  if idiots_ui.GUI then
+    idiots_ui.GUI.ID = axrc.GUI.id
+    idiots_ui.GUI:UpdateTabs()
+    idiots_ui.GUI:UpdateButtons()
+    idiots_ui.GUI:UpdateTitlebar()
+  end
+end
 
 local cw_commands = {}
 
@@ -226,12 +279,13 @@ end
 
 function uw_set_companion_squad_loot_mode(mode,npc,squad)
   -- printf("- [UW] uw_set_companion_squad_loot_mode mode %s npc %s squad %s",mode, npc and npc:id(), squad )
-  local group = "job"
+  local group = "jobs"
   local action = "loot_corpses"
   if npc then
     idiots_ui.GUI.ID = npc:id()
   end
   idiots_ui.GUI:OnClickButton(group, action)
+  -- idiots_ui.GUI:UpdateButtons()
 end
 
 -- ALL
@@ -271,8 +325,9 @@ end
 
 function uw_cycle_companions_loot_mode(force_mode, no_msg)
   -- printf("- [UW] uw_cycle_companions_loot_mode force_mode %s no_msg %s",force_mode, no_msg)
-  local group = "job"
+  local group = "jobs"
   local action = "loot_corpses"
   idiots_ui.GUI.ID = nil
   idiots_ui.GUI:OnClickButton(group, action)
+  -- idiots_ui.GUI:UpdateButtons()
 end
